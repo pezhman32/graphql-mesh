@@ -86,6 +86,7 @@ export interface TypeComposers {
 }
 
 export function getComposerFromJSONSchema(
+  subgraphName: string,
   schema: JSONSchema,
   logger: Logger,
 ): Promise<TypeComposers> {
@@ -193,12 +194,14 @@ export function getComposerFromJSONSchema(
             {
               name: 'regexp',
               args: {
+                subgraph: subgraphName,
                 pattern: subSchema.pattern,
               },
             },
             {
               name: 'typescript',
               args: {
+                subgraph: subgraphName,
                 type: typeScriptType,
               },
             },
@@ -230,6 +233,7 @@ export function getComposerFromJSONSchema(
                 {
                   name: 'enum',
                   args: {
+                    subgraph: subgraphName,
                     value: JSON.stringify(subSchema.const),
                   },
                 },
@@ -240,12 +244,14 @@ export function getComposerFromJSONSchema(
             {
               name: 'typescript',
               args: {
+                subgraph: subgraphName,
                 type: JSON.stringify(subSchema.const),
               },
             },
             {
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: subSchema.const,
               },
             },
@@ -282,6 +288,7 @@ export function getComposerFromJSONSchema(
             directives.push({
               name: 'enum',
               args: {
+                subgraph: subgraphName,
                 value: JSON.stringify(enumValue),
               },
             });
@@ -298,6 +305,7 @@ export function getComposerFromJSONSchema(
             directives.push({
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: example,
               },
             });
@@ -688,6 +696,7 @@ export function getComposerFromJSONSchema(
                 {
                   name: 'length',
                   args: {
+                    subgraph: subgraphName,
                     min: subSchema.minLength,
                     max: subSchema.maxLength,
                   },
@@ -759,6 +768,9 @@ export function getComposerFromJSONSchema(
           directives: [
             {
               name: 'oneOf',
+              args: {
+                subgraph: subgraphName,
+              },
             },
           ],
         });
@@ -829,6 +841,7 @@ export function getComposerFromJSONSchema(
             config.directives.push({
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: example,
               },
             });
@@ -845,6 +858,7 @@ export function getComposerFromJSONSchema(
             directives.push({
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: example,
               },
             });
@@ -896,9 +910,11 @@ export function getComposerFromJSONSchema(
       if (subSchemaOnly.discriminator?.propertyName) {
         schemaComposer.addDirective(DiscriminatorDirective);
         const discriminatorArgs: {
+          subgraph: string;
           field: string;
           mapping?: Record<string, string>;
         } = {
+          subgraph: subgraphName,
           field: subSchemaOnly.discriminator.propertyName,
         };
         if (subSchemaOnly.discriminator.mapping) {
@@ -920,6 +936,7 @@ export function getComposerFromJSONSchema(
         );
         if (isPlural) {
           const { input, output, flatten } = getUnionTypeComposers({
+            subgraphName,
             schemaComposer,
             typeComposersList: (subSchemaAndTypeComposers.oneOf as any).map(
               ({ input, output }: any) => ({
@@ -945,6 +962,7 @@ export function getComposerFromJSONSchema(
           };
         }
         return getUnionTypeComposers({
+          subgraphName,
           schemaComposer,
           typeComposersList: subSchemaAndTypeComposers.oneOf as any[],
           subSchemaAndTypeComposers,
@@ -1023,6 +1041,9 @@ export function getComposerFromJSONSchema(
               directives: [
                 {
                   name: 'resolveRoot',
+                  args: {
+                    subgraph: subgraphName,
+                  },
                 },
               ],
             };
@@ -1090,6 +1111,7 @@ export function getComposerFromJSONSchema(
             directives.push({
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: example,
               },
             });
@@ -1113,6 +1135,7 @@ export function getComposerFromJSONSchema(
               directives.push({
                 name: 'example',
                 args: {
+                  subgraph: subgraphName,
                   value: example,
                 },
               });
@@ -1202,6 +1225,9 @@ export function getComposerFromJSONSchema(
                   directives: [
                     {
                       name: 'resolveRoot',
+                      args: {
+                        subgraph: subgraphName,
+                      },
                     },
                   ],
                 };
@@ -1218,6 +1244,9 @@ export function getComposerFromJSONSchema(
                 directives: [
                   {
                     name: 'resolveRoot',
+                    args: {
+                      subgraph: subgraphName,
+                    },
                   },
                 ],
               };
@@ -1267,6 +1296,7 @@ export function getComposerFromJSONSchema(
             directives.push({
               name: 'example',
               args: {
+                subgraph: subgraphName,
                 value: example,
               },
             });
@@ -1293,6 +1323,7 @@ export function getComposerFromJSONSchema(
               directives.push({
                 name: 'example',
                 args: {
+                  subgraph: subgraphName,
                   value: example,
                 },
               });
@@ -1322,6 +1353,7 @@ export function getComposerFromJSONSchema(
                 fieldDirectives.push({
                   name: 'resolveRootField',
                   args: {
+                    subgraph: subgraphName,
                     field: propertyName,
                   },
                 });
@@ -1330,6 +1362,9 @@ export function getComposerFromJSONSchema(
                 schemaComposer.addDirective(FlattenDirective);
                 fieldDirectives.push({
                   name: 'flatten',
+                  args: {
+                    subgraph: subgraphName,
+                  },
                 });
               }
               fieldMap[fieldName] = {
@@ -1366,6 +1401,7 @@ export function getComposerFromJSONSchema(
                 directives.push({
                   name: 'resolveRootField',
                   args: {
+                    subgraph: subgraphName,
                     field: propertyName,
                   },
                 });
@@ -1426,6 +1462,9 @@ export function getComposerFromJSONSchema(
                 directives: [
                   {
                     name: 'dictionary',
+                    args: {
+                      subgraph: subgraphName,
+                    },
                   },
                 ],
               };
@@ -1436,6 +1475,9 @@ export function getComposerFromJSONSchema(
                 directives: [
                   {
                     name: 'resolveRoot',
+                    args: {
+                      subgraph: subgraphName,
+                    },
                   },
                 ],
               };

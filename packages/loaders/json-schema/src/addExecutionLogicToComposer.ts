@@ -47,7 +47,7 @@ const responseMetadataType = new GraphQLObjectType({
 });
 
 export async function addExecutionDirectivesToComposer(
-  name: string,
+  subgraphName: string,
   {
     schemaComposer,
     logger,
@@ -63,7 +63,7 @@ export async function addExecutionDirectivesToComposer(
     'globalOptions',
     JSON.parse(
       JSON.stringify({
-        sourceName: name,
+        subgraph: subgraphName,
         endpoint,
         operationHeaders,
         queryStringOptions,
@@ -87,6 +87,7 @@ export async function addExecutionDirectivesToComposer(
       field.directives.push({
         name: 'pubsubOperation',
         args: {
+          subgraph: subgraphName,
           pubsubTopic: operationConfig.pubsubTopic,
         },
       });
@@ -108,6 +109,7 @@ ${operationConfig.description || ''}
         name: 'httpOperation',
         args: JSON.parse(
           JSON.stringify({
+            subgraph: subgraphName,
             path: operationConfig.path,
             operationSpecificHeaders: operationConfig.headers,
             httpMethod,
@@ -135,6 +137,7 @@ ${operationConfig.description || ''}
                 linkResolverMapDirective = {
                   name: 'linkResolver',
                   args: {
+                    subgraph: subgraphName,
                     linkResolverMap: {},
                   },
                 };
@@ -154,7 +157,7 @@ ${operationConfig.description || ''}
               }
               if (!targetField) {
                 logger.debug(
-                  `Field ${linkObj.fieldName} not found in ${name} for link ${linkName}`,
+                  `Field ${linkObj.fieldName} not found in ${subgraphName} for link ${linkName}`,
                 );
               }
               linkResolverFieldMap[linkName] = {
@@ -169,6 +172,7 @@ ${operationConfig.description || ''}
                   {
                     name: 'link',
                     args: {
+                      subgraph: subgraphName,
                       defaultRootType: rootTypeName,
                       defaultField: operationConfig.field,
                     },
@@ -196,6 +200,9 @@ ${operationConfig.description || ''}
             directives: [
               {
                 name: 'responseMetadata',
+                args: {
+                  subgraph: subgraphName,
+                },
               },
             ],
           },
@@ -230,6 +237,9 @@ ${operationConfig.description || ''}
                     directives: [
                       {
                         name: 'resolveRoot',
+                        args: {
+                          subgraph: subgraphName,
+                        },
                       },
                     ],
                   },
@@ -247,6 +257,9 @@ ${operationConfig.description || ''}
                   directives: [
                     {
                       name: 'responseMetadata',
+                      args: {
+                        subgraph: subgraphName,
+                      },
                     },
                   ],
                 },
