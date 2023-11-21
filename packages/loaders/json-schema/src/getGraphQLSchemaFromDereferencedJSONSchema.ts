@@ -42,7 +42,7 @@ export async function getGraphQLSchemaFromDereferencedJSONSchema(
     schemaComposerWithoutExecutionLogic.addDirective(directive);
   }
 
-  const schemaComposerWithExecutionLogic = await addExecutionDirectivesToComposer(subgraphName, {
+  return addExecutionDirectivesToComposer(subgraphName, {
     schemaComposer: schemaComposerWithoutExecutionLogic,
     logger,
     operations,
@@ -52,15 +52,4 @@ export async function getGraphQLSchemaFromDereferencedJSONSchema(
     queryStringOptions,
     handlerName,
   });
-
-  if (schemaComposerWithExecutionLogic.Query.getFieldNames().length === 0) {
-    schemaComposerWithExecutionLogic.Query.addFields({
-      dummy: {
-        type: 'String',
-        resolve: () => 'dummy',
-      },
-    });
-  }
-
-  return schemaComposerWithExecutionLogic.buildSchema();
 }
